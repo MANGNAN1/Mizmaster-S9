@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageTk, ImageSequence
 import pandas as pd
 import os
+import re  # 정규 표현식을 사용하기 위한 모듈
 
 # CSV 파일 읽기 (파일 경로에 주의하세요)
 csv_file = "henchies.csv"
@@ -26,7 +27,7 @@ class HenchApp:
     def __init__(self, root):
         self.root = root
         self.root.title("헨치 도감")
-        self.root.geometry("470x600")
+        self.root.geometry("600x600")
 
         self.create_widgets()
 
@@ -116,13 +117,19 @@ class HenchApp:
         combo_subs = hench["조합식 서브"].split(';')
 
         for i, (main, sub) in enumerate(zip(combo_mains, combo_subs)):
-            main_label = ttk.Label(self.combo_frame, text=main)
+            main_label = ttk.Button(self.combo_frame, text=main, command=lambda m=main: self.search_hench_name(m))
             main_label.grid(row=i+1, column=0, sticky="w", padx=10, pady=5)
             self.main_combo_labels.append(main_label)
 
-            sub_label = ttk.Label(self.combo_frame, text=sub)
+            sub_label = ttk.Button(self.combo_frame, text=sub, command=lambda s=sub: self.search_hench_name(s))
             sub_label.grid(row=i+1, column=1, sticky="w", padx=10, pady=5)
             self.sub_combo_labels.append(sub_label)
+
+    def search_hench_name(self, hench_name):
+        # 특수 문자와 숫자를 제거하여 검색어로 사용
+        cleaned_name = re.sub(r'[\W\d]', '', hench_name).strip().lower()
+        self.hench_name_var.set(cleaned_name)
+        self.search_hench()
 
 if __name__ == "__main__":
     root = tk.Tk()
