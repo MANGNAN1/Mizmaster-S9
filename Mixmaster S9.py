@@ -95,15 +95,20 @@ class HenchApp:
                 label.config(text=hench[key])
 
         img_path = os.path.join("헨치사진", hench["이미지"])
-        img = Image.open(img_path)
+        
+        # 사진 파일이 존재하는 경우에만 이미지를 열어서 표시합니다
+        if os.path.isfile(img_path):
+            img = Image.open(img_path)
 
-        # GIF 이미지의 첫 번째 프레임을 사용
-        if img_path.lower().endswith(".gif"):
-            img = next(ImageSequence.Iterator(img))
+            # GIF 이미지의 첫 번째 프레임을 사용
+            if img_path.lower().endswith(".gif"):
+                img = next(ImageSequence.Iterator(img))
 
-        img = img.resize((150, 150), Image.LANCZOS)
-        self.hench_img = ImageTk.PhotoImage(img)
-        self.hench_image_label.config(image=self.hench_img)
+            img = img.resize((150, 150), Image.LANCZOS)
+            self.hench_img = ImageTk.PhotoImage(img)
+            self.hench_image_label.config(image=self.hench_img)
+        else:
+            self.hench_image_label.config(image=None)  # 사진이 없을 경우 이미지를 지웁니다
 
         # 기존 조합식 레이블 제거
         for label in self.main_combo_labels + self.sub_combo_labels:
@@ -117,11 +122,11 @@ class HenchApp:
         combo_subs = hench["조합식 서브"].split(';')
 
         for i, (main, sub) in enumerate(zip(combo_mains, combo_subs)):
-            main_label = ttk.Button(self.combo_frame, text=main, command=lambda m=main: self.search_hench_name(m))
+            main_label = ttk.Button(self.combo_frame, text=self.clean_hench_name(main), command=lambda m=main: self.search_hench_name(m))
             main_label.grid(row=i+1, column=0, sticky="w", padx=10, pady=5)
             self.main_combo_labels.append(main_label)
 
-            sub_label = ttk.Button(self.combo_frame, text=sub, command=lambda s=sub: self.search_hench_name(s))
+            sub_label = ttk.Button(self.combo_frame, text=self.clean_hench_name(sub), command=lambda s=sub: self.search_hench_name(s))
             sub_label.grid(row=i+1, column=1, sticky="w", padx=10, pady=5)
             self.sub_combo_labels.append(sub_label)
 
@@ -130,6 +135,10 @@ class HenchApp:
         cleaned_name = re.sub(r'[\W\d]', '', hench_name).strip().lower()
         self.hench_name_var.set(cleaned_name)
         self.search_hench()
+
+    def clean_hench_name(self, hench_name):
+        # 특수 문자와 숫자를 제거한 이름 반환
+        return re.sub(r'[\W\d]', '', hench_name).strip()
 
 if __name__ == "__main__":
     root = tk.Tk()
