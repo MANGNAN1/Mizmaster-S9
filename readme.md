@@ -1,1 +1,1 @@
-pip install pandas pillow
+pip install tkinter pillow pandas
