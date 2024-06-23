@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageTk, ImageSequence
 import pandas as pd
 import os
-import re  # 정규 표현식을 사용하기 위한 모듈
+import re
 
 # 엑셀 파일 읽기 (파일 경로에 주의하세요)
 excel_file = "henchies.xlsx"
@@ -24,7 +24,7 @@ class HenchApp:
     def __init__(self, root):
         self.root = root
         self.root.title("헨치 도감")
-        self.root.geometry("600x600")
+        self.root.geometry("800x700")
 
         self.create_widgets()
 
@@ -49,7 +49,9 @@ class HenchApp:
             "득 여부": ttk.Label(self.info_frame, text="득 여부:"),
             "레벨": ttk.Label(self.info_frame, text="레벨:"),
             "공격 타입": ttk.Label(self.info_frame, text="공격 타입:"),
-            "속성": ttk.Label(self.info_frame, text="속성:")
+            "속성": ttk.Label(self.info_frame, text="속성:"),
+            "상위 헨치": ttk.Label(self.info_frame, text="상위 헨치:"),
+            "시세": ttk.Label(self.info_frame, text="시세:")
         }
 
         for i, (key, label) in enumerate(self.info_labels.items()):
@@ -58,7 +60,7 @@ class HenchApp:
             getattr(self, f"hench_{key}").grid(row=i, column=1, sticky="w", padx=10, pady=5)
 
         self.hench_image_label = ttk.Label(self.info_frame)
-        self.hench_image_label.grid(row=0, column=2, rowspan=7, padx=10, pady=10)
+        self.hench_image_label.grid(row=0, column=2, rowspan=9, padx=10, pady=10)
 
         # 조합식 정보
         self.combo_frame = ttk.LabelFrame(self.root, text="조합식")
@@ -66,9 +68,11 @@ class HenchApp:
 
         ttk.Label(self.combo_frame, text="메인:").grid(row=0, column=0, sticky="w", padx=10, pady=5)
         ttk.Label(self.combo_frame, text="서브:").grid(row=0, column=1, sticky="w", padx=10, pady=5)
+        ttk.Label(self.combo_frame, text="상위 헨치:").grid(row=0, column=2, sticky="w", padx=10, pady=5)
 
         self.main_combo_labels = []
         self.sub_combo_labels = []
+        self.upper_combo_labels = []
 
     def search_hench(self, event=None):
         hench_name = self.hench_name_var.get().strip().lower()  # 검색어를 소문자로 변환
@@ -108,17 +112,19 @@ class HenchApp:
             self.hench_image_label.config(image=None)  # 사진이 없을 경우 이미지를 지웁니다
 
         # 기존 조합식 레이블 제거
-        for label in self.main_combo_labels + self.sub_combo_labels:
+        for label in self.main_combo_labels + self.sub_combo_labels + self.upper_combo_labels:
             label.destroy()
 
         # 새로운 조합식 레이블 생성
         self.main_combo_labels = []
         self.sub_combo_labels = []
+        self.upper_combo_labels = []
 
         combo_mains = str(hench["조합식 메인"]).split(';')
         combo_subs = str(hench["조합식 서브"]).split(';')
+        upper_hench = str(hench["상위 헨치"]).split(';')
 
-        for i, (main, sub) in enumerate(zip(combo_mains, combo_subs)):
+        for i, (main, sub, upper) in enumerate(zip(combo_mains, combo_subs, upper_hench)):
             main_label = ttk.Button(self.combo_frame, text=self.clean_hench_name(main), command=lambda m=main: self.search_hench_name(m))
             main_label.grid(row=i+1, column=0, sticky="w", padx=10, pady=5)
             self.main_combo_labels.append(main_label)
@@ -126,6 +132,10 @@ class HenchApp:
             sub_label = ttk.Button(self.combo_frame, text=self.clean_hench_name(sub), command=lambda s=sub: self.search_hench_name(s))
             sub_label.grid(row=i+1, column=1, sticky="w", padx=10, pady=5)
             self.sub_combo_labels.append(sub_label)
+
+            upper_label = ttk.Button(self.combo_frame, text=self.clean_hench_name(upper), command=lambda u=upper: self.search_hench_name(u))
+            upper_label.grid(row=i+1, column=2, sticky="w", padx=10, pady=5)
+            self.upper_combo_labels.append(upper_label)
 
     def search_hench_name(self, hench_name):
         # 특수 문자와 숫자를 제거하여 검색어로 사용
