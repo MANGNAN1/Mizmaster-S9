@@ -20,55 +20,69 @@ except Exception as e:
     messagebox.showerror("파일 오류", f"{excel_file} 파일을 읽을 수 없습니다. 오류: {e}")
     exit()
 
+# 이름과 호주명을 소문자로 정규화하여 컬럼 추가
+henches_df['정규화된_이름'] = henches_df['이름'].str.replace(r'[\W\d]', '', regex=True).str.strip().str.lower()
+henches_df['정규화된_호주명'] = henches_df['호주명'].str.replace(r'[\W\d]', '', regex=True).str.strip().str.lower()
+
 class HenchApp:
     def __init__(self, root):
         self.root = root
         self.root.title("헨치 도감")
-        self.root.geometry("800x700")
-
+        self.root.geometry("620x800")
+        
+        # Apply a modern theme
+        style = ttk.Style()
+        style.theme_use('clam')  # 'clam', 'alt', 'default', 'classic'
+        
         self.create_widgets()
 
     def create_widgets(self):
+        # Create main frame
+        main_frame = ttk.Frame(self.root, padding="10 10 10 10")
+        main_frame.grid(row=0, column=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+        
         # 헨치 이름 입력 및 검색 버튼
-        ttk.Label(self.root, text="헨치 이름을 입력하세요:").grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        ttk.Label(main_frame, text="헨치 이름을 입력하세요:", font=("Helvetica", 12)).grid(row=0, column=0, padx=10, pady=10, sticky="w")
         self.hench_name_var = tk.StringVar()
-        self.hench_entry = ttk.Entry(self.root, textvariable=self.hench_name_var)
+        self.hench_entry = ttk.Entry(main_frame, textvariable=self.hench_name_var, font=("Helvetica", 12), width=30)
         self.hench_entry.grid(row=0, column=1, padx=10, pady=10)
         self.hench_entry.bind("<Return>", self.search_hench)
 
-        ttk.Button(self.root, text="검색", command=self.search_hench).grid(row=0, column=2, padx=10, pady=10)
+        ttk.Button(main_frame, text="검색", command=self.search_hench, width=10).grid(row=0, column=2, padx=10, pady=10)
 
         # 헨치 정보 표시
-        self.info_frame = ttk.LabelFrame(self.root, text="헨치 정보")
+        self.info_frame = ttk.LabelFrame(main_frame, text="헨치 정보", padding="10 10 10 10")
         self.info_frame.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
 
         self.info_labels = {
-            "이름": ttk.Label(self.info_frame, text="이름:"),
-            "서식지": ttk.Label(self.info_frame, text="서식지:"),
-            "선공 여부": ttk.Label(self.info_frame, text="선공 여부:"),
-            "득 여부": ttk.Label(self.info_frame, text="득 여부:"),
-            "레벨": ttk.Label(self.info_frame, text="레벨:"),
-            "공격 타입": ttk.Label(self.info_frame, text="공격 타입:"),
-            "속성": ttk.Label(self.info_frame, text="속성:"),
-            "상위 헨치": ttk.Label(self.info_frame, text="상위 헨치:"),
-            "시세": ttk.Label(self.info_frame, text="시세:")
+            "이름": ttk.Label(self.info_frame, text="이름:", font=("Helvetica", 10)),
+            "서식지": ttk.Label(self.info_frame, text="서식지:", font=("Helvetica", 10)),
+            "선공 여부": ttk.Label(self.info_frame, text="선공 여부:", font=("Helvetica", 10)),
+            "득 여부": ttk.Label(self.info_frame, text="득 여부:", font=("Helvetica", 10)),
+            "레벨": ttk.Label(self.info_frame, text="레벨:", font=("Helvetica", 10)),
+            "공격 타입": ttk.Label(self.info_frame, text="공격 타입:", font=("Helvetica", 10)),
+            "속성": ttk.Label(self.info_frame, text="속성:", font=("Helvetica", 10)),
+            "시세": ttk.Label(self.info_frame, text="시세:", font=("Helvetica", 10))
         }
 
         for i, (key, label) in enumerate(self.info_labels.items()):
             label.grid(row=i, column=0, sticky="w", padx=10, pady=5)
-            setattr(self, f"hench_{key}", ttk.Label(self.info_frame, text=""))
+            setattr(self, f"hench_{key}", ttk.Label(self.info_frame, text="", font=("Helvetica", 10)))
             getattr(self, f"hench_{key}").grid(row=i, column=1, sticky="w", padx=10, pady=5)
 
         self.hench_image_label = ttk.Label(self.info_frame)
         self.hench_image_label.grid(row=0, column=2, rowspan=9, padx=10, pady=10)
 
         # 조합식 정보
-        self.combo_frame = ttk.LabelFrame(self.root, text="조합식")
+        self.combo_frame = ttk.LabelFrame(main_frame, text="조합식", padding="10 10 10 10")
         self.combo_frame.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
 
-        ttk.Label(self.combo_frame, text="메인:").grid(row=0, column=0, sticky="w", padx=10, pady=5)
-        ttk.Label(self.combo_frame, text="서브:").grid(row=0, column=1, sticky="w", padx=10, pady=5)
-        ttk.Label(self.combo_frame, text="상위 헨치:").grid(row=0, column=2, sticky="w", padx=10, pady=5)
+        ttk.Label(self.combo_frame, text="메인:", font=("Helvetica", 10)).grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        ttk.Label(self.combo_frame, text="서브:", font=("Helvetica", 10)).grid(row=0, column=1, sticky="w", padx=10, pady=5)
+        ttk.Label(self.combo_frame, text="상위 헨치:", font=("Helvetica", 10)).grid(row=0, column=2, sticky="w", padx=10, pady=5)
 
         self.main_combo_labels = []
         self.sub_combo_labels = []
@@ -76,10 +90,14 @@ class HenchApp:
 
     def search_hench(self, event=None):
         hench_name = self.hench_name_var.get().strip().lower()  # 검색어를 소문자로 변환
+        cleaned_name = re.sub(r'[\W\d]', '', hench_name)  # 특수 문자와 숫자를 제거
+        print(f"Searching for hench: {cleaned_name}")  # 디버그 메시지
 
         # 한국명 또는 호주명으로 검색 (소문자로 비교)
-        hench = henches_df[(henches_df['이름'].str.strip().str.lower() == hench_name) | 
-                           (henches_df['호주명'].str.strip().str.lower() == hench_name)]
+        hench = henches_df[(henches_df['정규화된_이름'] == cleaned_name) | 
+                           (henches_df['정규화된_호주명'] == cleaned_name)]
+
+        print(f"Search result: {hench}")  # 디버그 메시지
 
         if not hench.empty:
             hench = hench.iloc[0]
@@ -124,28 +142,33 @@ class HenchApp:
         combo_subs = str(hench["조합식 서브"]).split(';')
         upper_hench = str(hench["상위 헨치"]).split(';')
 
-        for i, (main, sub, upper) in enumerate(zip(combo_mains, combo_subs, upper_hench)):
-            main_label = ttk.Button(self.combo_frame, text=self.clean_hench_name(main), command=lambda m=main: self.search_hench_name(m))
+        max_len = max(len(combo_mains), len(combo_subs), len(upper_hench))
+
+        for i in range(max_len):
+            main = combo_mains[i] if i < len(combo_mains) else ""
+            sub = combo_subs[i] if i < len(combo_subs) else ""
+            upper = upper_hench[i] if i < len(upper_hench) else ""
+
+            main_label = ttk.Button(self.combo_frame, text=main, command=lambda m=main: self.search_hench_name(m))
             main_label.grid(row=i+1, column=0, sticky="w", padx=10, pady=5)
             self.main_combo_labels.append(main_label)
 
-            sub_label = ttk.Button(self.combo_frame, text=self.clean_hench_name(sub), command=lambda s=sub: self.search_hench_name(s))
+            sub_label = ttk.Button(self.combo_frame, text=sub, command=lambda s=sub: self.search_hench_name(s))
             sub_label.grid(row=i+1, column=1, sticky="w", padx=10, pady=5)
             self.sub_combo_labels.append(sub_label)
 
-            upper_label = ttk.Button(self.combo_frame, text=self.clean_hench_name(upper), command=lambda u=upper: self.search_hench_name(u))
+            upper_label = ttk.Button(self.combo_frame, text=upper, command=lambda u=upper: self.search_hench_name(u, clean=False))
             upper_label.grid(row=i+1, column=2, sticky="w", padx=10, pady=5)
             self.upper_combo_labels.append(upper_label)
 
-    def search_hench_name(self, hench_name):
-        # 특수 문자와 숫자를 제거하여 검색어로 사용
-        cleaned_name = re.sub(r'[\W\d]', '', hench_name).strip().lower()
+    def search_hench_name(self, hench_name, clean=True):
+        # clean이 True이면 특수 문자와 공백, 숫자를 제거하여 검색어로 사용
+        if clean:
+            cleaned_name = re.sub(r'[\W\d]', '', hench_name).strip().lower()
+        else:
+            cleaned_name = hench_name.strip().lower()
         self.hench_name_var.set(cleaned_name)
         self.search_hench()
-
-    def clean_hench_name(self, hench_name):
-        # 특수 문자와 숫자를 제거한 이름 반환
-        return re.sub(r'[\W\d]', '', hench_name).strip()
 
 if __name__ == "__main__":
     root = tk.Tk()
