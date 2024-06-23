@@ -5,23 +5,20 @@ import pandas as pd
 import os
 import re  # 정규 표현식을 사용하기 위한 모듈
 
-# CSV 파일 읽기 (파일 경로에 주의하세요)
-csv_file = "henchies.csv"
+# 엑셀 파일 읽기 (파일 경로에 주의하세요)
+excel_file = "henchies.xlsx"
 
 # 파일이 존재하는지 먼저 확인합니다
-if not os.path.isfile(csv_file):
-    messagebox.showerror("파일 오류", f"{csv_file} 파일을 찾을 수 없습니다.")
+if not os.path.isfile(excel_file):
+    messagebox.showerror("파일 오류", f"{excel_file} 파일을 찾을 수 없습니다.")
     exit()
 
-# 다양한 인코딩으로 시도
+# 다양한 인코딩으로 시도할 필요 없음
 try:
-    henches_df = pd.read_csv(csv_file, encoding='utf-8')  # 기본 'utf-8'로 시도
-except UnicodeDecodeError:
-    try:
-        henches_df = pd.read_csv(csv_file, encoding='euc-kr')  # 'euc-kr'로 시도
-    except Exception as e:
-        messagebox.showerror("파일 오류", f"{csv_file} 파일을 읽을 수 없습니다. 오류: {e}")
-        exit()
+    henches_df = pd.read_excel(excel_file)
+except Exception as e:
+    messagebox.showerror("파일 오류", f"{excel_file} 파일을 읽을 수 없습니다. 오류: {e}")
+    exit()
 
 class HenchApp:
     def __init__(self, root):
@@ -118,8 +115,8 @@ class HenchApp:
         self.main_combo_labels = []
         self.sub_combo_labels = []
 
-        combo_mains = hench["조합식 메인"].split(';')
-        combo_subs = hench["조합식 서브"].split(';')
+        combo_mains = str(hench["조합식 메인"]).split(';')
+        combo_subs = str(hench["조합식 서브"]).split(';')
 
         for i, (main, sub) in enumerate(zip(combo_mains, combo_subs)):
             main_label = ttk.Button(self.combo_frame, text=self.clean_hench_name(main), command=lambda m=main: self.search_hench_name(m))
