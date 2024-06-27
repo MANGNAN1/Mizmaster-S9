@@ -8,9 +8,9 @@ import re
 import sys
 
 def resource_path(relative_path):
-    """ Get the absolute path to the resource, works for dev and for PyInstaller """
+    """ 리소스의 절대 경로를 반환합니다. 개발 환경과 PyInstaller 빌드 환경을 모두 지원합니다. """
     try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        # PyInstaller는 임시 폴더를 만들고 _MEIPASS에 경로를 저장합니다
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
@@ -40,16 +40,16 @@ class HenchApp:
     def __init__(self, root):
         self.root = root
         self.root.title("헨치 도감")
-        self.root.geometry("620x800")
+        self.root.geometry("620x900")
         
-        # Apply a modern theme
+        # 현대적인 테마 적용
         style = ttk.Style()
         style.theme_use('clam')  # 'clam', 'alt', 'default', 'classic'
         
         self.create_widgets()
 
     def create_widgets(self):
-        # Create main frame
+        # 메인 프레임 생성
         main_frame = ttk.Frame(self.root, padding="10 10 10 10")
         main_frame.grid(row=0, column=0, sticky=(tk.N, tk.W, tk.E, tk.S))
         
@@ -99,6 +99,41 @@ class HenchApp:
         self.main_combo_labels = []
         self.sub_combo_labels = []
         self.upper_combo_labels = []
+
+        # 믹스레벨 계산기 관련 위젯
+        self.mix_level_frame = ttk.LabelFrame(main_frame, text="믹스레벨 계산기", padding="10 10 10 10")
+        self.mix_level_frame.grid(row=3, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
+
+        self.show_mix_calc_button = ttk.Button(main_frame, text="믹스레벨 계산기 보이기", command=self.toggle_mix_calc)
+        self.show_mix_calc_button.grid(row=4, column=0, columnspan=3, pady=10)
+
+        self.mix_level_frame.grid_remove()  # 초기에 숨겨진 상태로 설정
+
+        # 메인코어 및 서브코어 레벨 입력 필드
+        ttk.Label(self.mix_level_frame, text="메인코어 현재 레벨:").grid(row=0, column=0, padx=10, pady=5, sticky="e")
+        ttk.Label(self.mix_level_frame, text="메인코어 맥스 레벨:").grid(row=1, column=0, padx=10, pady=5, sticky="e")
+        ttk.Label(self.mix_level_frame, text="서브코어 현재 레벨:").grid(row=2, column=0, padx=10, pady=5, sticky="e")
+        ttk.Label(self.mix_level_frame, text="서브코어 맥스 레벨:").grid(row=3, column=0, padx=10, pady=5, sticky="e")
+
+        self.main_current_level_var = tk.IntVar()
+        self.main_max_level_var = tk.IntVar()
+        self.sub_current_level_var = tk.IntVar()
+        self.sub_max_level_var = tk.IntVar()
+
+        ttk.Entry(self.mix_level_frame, textvariable=self.main_current_level_var, width=10).grid(row=0, column=1, padx=10, pady=5)
+        ttk.Entry(self.mix_level_frame, textvariable=self.main_max_level_var, width=10).grid(row=1, column=1, padx=10, pady=5)
+        ttk.Entry(self.mix_level_frame, textvariable=self.sub_current_level_var, width=10).grid(row=2, column=1, padx=10, pady=5)
+        ttk.Entry(self.mix_level_frame, textvariable=self.sub_max_level_var, width=10).grid(row=3, column=1, padx=10, pady=5)
+
+        ttk.Button(self.mix_level_frame, text="계산하기", command=self.calculate_mix_level).grid(row=4, column=0, columnspan=2, pady=10)
+
+    def toggle_mix_calc(self):
+        if self.mix_level_frame.winfo_ismapped():
+            self.mix_level_frame.grid_remove()
+            self.show_mix_calc_button.config(text="믹스레벨 계산기 보이기")
+        else:
+            self.mix_level_frame.grid()
+            self.show_mix_calc_button.config(text="믹스레벨 계산기 숨기기")
 
     def search_hench(self, event=None):
         hench_name = self.hench_name_var.get().strip().lower()  # 검색어를 소문자로 변환
@@ -186,6 +221,16 @@ class HenchApp:
 
         self.hench_name_var.set(cleaned_name)
         self.search_hench()
+
+    def calculate_mix_level(self):
+        a = self.main_current_level_var.get()
+        b = self.sub_current_level_var.get()
+        c = self.main_max_level_var.get()
+        d = self.sub_max_level_var.get()
+
+        mix_level = ((a + b) / 2) + ((((100 * a) / c) + ((100 * b) / d)) * 0.05)
+
+        messagebox.showinfo("믹스레벨 계산 결과", f"믹스레벨: {mix_level:.2f}")
 
 if __name__ == "__main__":
     root = tk.Tk()
