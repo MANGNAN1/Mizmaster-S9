@@ -14,7 +14,7 @@ Types if import:
 IMPORTANT: Do NOT post this list to the issue-tracker. Use it as a basis for
             tracking down the missing module yourself. Thanks!
 
-missing module named pyimod02_importers - imported by C:\Users\jdy26\AppData\Local\Programs\Python\Python312\Lib\site-packages\PyInstaller\hooks\rthooks\pyi_rth_pkgutil.py (delayed), C:\Users\jdy26\AppData\Local\Programs\Python\Python312\Lib\site-packages\PyInstaller\hooks\rthooks\pyi_rth_pkgres.py (delayed)
+missing module named pyimod02_importers - imported by C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\PyInstaller\hooks\rthooks\pyi_rth_pkgutil.py (delayed), C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\PyInstaller\hooks\rthooks\pyi_rth_pkgres.py (delayed)
 missing module named pwd - imported by posixpath (delayed, conditional, optional), shutil (delayed, optional), tarfile (optional), pathlib (delayed, optional), subprocess (delayed, conditional, optional), http.server (delayed, optional), netrc (delayed, conditional), getpass (delayed), pkg_resources._vendor.backports.tarfile (optional)
 missing module named grp - imported by shutil (delayed, optional), tarfile (optional), pathlib (delayed, optional), subprocess (delayed, conditional, optional), pkg_resources._vendor.backports.tarfile (optional)
 missing module named posix - imported by os (conditional, optional), posixpath (optional), shutil (conditional), importlib._bootstrap_external (conditional)
@@ -31,8 +31,8 @@ missing module named 'pkg_resources.extern.more_itertools' - imported by pkg_res
 missing module named 'pkg_resources.extern.backports' - imported by pkg_resources._vendor.jaraco.context (conditional)
 missing module named _scproxy - imported by urllib.request (conditional)
 missing module named termios - imported by tty (top-level), getpass (optional)
-missing module named _typeshed - imported by pkg_resources (conditional)
 missing module named typing_extensions - imported by PIL._typing (conditional, optional), pkg_resources (conditional), pandas._typing (conditional), pkg_resources._vendor.packaging.metadata (conditional, optional)
+missing module named _typeshed - imported by pkg_resources (conditional)
 missing module named 'pkg_resources.extern.platformdirs' - imported by pkg_resources (top-level)
 missing module named 'pkg_resources.extern.packaging' - imported by pkg_resources (top-level)
 missing module named 'pkg_resources.extern.jaraco' - imported by pkg_resources (top-level), pkg_resources._vendor.jaraco.text (top-level)
