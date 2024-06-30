@@ -166,11 +166,12 @@ class HenchApp:
         if os.path.isfile(img_path):
             img = Image.open(img_path)
 
-            # GIF 이미지의 첫 번째 프레임을 사용
-            if img_path.lower().endswith(".gif"):
-                img = next(ImageSequence.Iterator(img))
+            # 1차인챈, 2차인챈, 3차인챈, 4차인챈인 경우 크기를 크게 설정
+            if any(tag in hench["이름"] for tag in ["1차인챈", "2차인챈", "3차인챈", "4차인챈"]):
+                img = img.resize((350, 350), Image.LANCZOS)
+            else:
+                img = img.resize((150, 150), Image.LANCZOS)
 
-            img = img.resize((150, 150), Image.LANCZOS)
             self.hench_img = ImageTk.PhotoImage(img)
             self.hench_image_label.config(image=self.hench_img)
         else:
